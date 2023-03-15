@@ -7,13 +7,23 @@ const pathCharacter = '*';
 
 class Field {
     constructor(width, height) {
-        this._fieldArray = Field.generateField(height, width);
+        this._maskedField = Field.generateMaskedField(height, width);
+        this._unmaskedField = Field.generateUnmaskedField(this._maskedField);
+    }
+
+    get maskedField() {
+        return this._maskedField;
+    }
+
+    get unmaskedField() {
+        return this._unmaskedField;
     }
 
     // prints the field for the current game
-    print() {
-        for (let i in this._fieldArray) {
-            console.log(this._fieldArray[i].join(''));
+    print(field) {
+        for (let i in field) {
+            console.log(field[i].join(' '));
+            console.log('');
         }
     }
 
@@ -26,17 +36,43 @@ class Field {
         }
     }
 
-    // generates a new field
-    static generateField(height, width) {
-        let newField;
+    // generates a new empty field and places player on a random edge square
+    static generateMaskedField(height, width) {
+        let maskedField = [];
+        for (let i = 0; i <= height - 1; i++) {
+            let newRow = [];
+            for (let j = 0; j <= width - 1; j++) {
+                newRow.push(fieldCharacter);
+            }
+            maskedField.push(newRow);
+        }
 
-        for (let i = 1; i <= height; i++) {
-            let newRow;
-            for (let j = 1; j <= width; j++) {
-                // auto-generate new field
+        const XorY = Math.floor(Math.random() * 2);
+        let startX;
+        let startY;
+        if (XorY === 0) {
+            startX = Math.floor(Math.random() * width);
+            if (Math.floor(Math.random() * 2) === 0) {
+                startY = 0;
+            } else {
+                startY = height - 1;
+            }
+        } else {
+            startY = Math.floor(Math.random() * height);
+            if (Math.floor(Math.random() * 2) === 0) {
+                startX = 0;
+            } else {
+                startX = width - 1;
             }
         }
-        return newField;
+        
+        maskedField[startX][startY] = pathCharacter;
+        return maskedField;
+    }
+
+    // places hat, holes, and player on the field
+    static generateUnmaskedField(maskedField) {
+        return maskedField;
     }
 
     // moves player based on user input
@@ -48,30 +84,27 @@ class Field {
 function playGame() {
     let height;
     let width;
-    height = prompt('Enter field height (minimum 5 and maximum 20: ');
-    // checks for minimum and maximum height
-    while (typeof height !== 'number' || height < 5 || height > 20) {
-        console.log('Invalid field height.');
-        height = prompt('Enter field height (minimum 5 and maximum 20: ');
+
+    // prompts user for height value
+    height = Number(prompt('Enter field height (minimum 3 and maximum 12): '));
+    // checks for valid input, minimum height, and maximum height
+    while (Number.isNaN(height) || height < 3 || height > 12) {
+        console.log('Invalid height.');
+        height = Number(prompt('Enter field height (minimum 3 and maximum 12): '));
     }
-    width = prompt('Enter field width (minimum 5 and maximum 20: ');
-    // checks for minimum and maximum width
-    while (typeof width !== 'number' || width < 5 || width > 20) {
-        console.log('Invalid field width.');
-        width = prompt('Enter field width (minimum 5 and maximum 20: ');
+
+    // prompts user for width value
+    width = Number(prompt('Enter field width (minimum 3 and maximum 12): '));
+    // checks for valid input, minimum width, and maximum width
+    while (Number.isNaN(width) || width < 3 || width > 12) {
+        console.log('Invalid width.');
+        width = Number(prompt('Enter field width (minimum 3 and maximum 12): '));
     }
+
     let winLossConditionMet = false;
 
     const newGame = new Field(height, width);
-    const myField = new Field([
-        ['*', '░', 'O'],
-        ['░', 'O', '░'],
-        ['░', '^', '░'],
-    ]);
-    
-    myField.print();
-    console.log(myField._fieldArray);
-    console.log('');
+    newGame.print(newGame.maskedField);
 }
 
 playGame();
