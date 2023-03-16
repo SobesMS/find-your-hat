@@ -8,7 +8,8 @@ const pathCharacter = '*';
 class Field {
     constructor(width, height) {
         this._maskedField = Field.generateMaskedField(height, width);
-        this._unmaskedField = Field.generateUnmaskedField(this._maskedField);
+        this._unmaskedField = this.generateItemLocations(this._maskedField, height, width);
+        this.generateStartingLocation(height, width);
     }
 
     get maskedField() {
@@ -46,8 +47,17 @@ class Field {
             }
             maskedField.push(newRow);
         }
+        return maskedField;
+    }
 
+    // places hat, holes, and starting location
+    generateItemLocations(maskedField, height, width) {
+        
+    }
+
+    generateStartingLocation(height, width) {
         const XorY = Math.floor(Math.random() * 2);
+        console.log(XorY);
         let startX;
         let startY;
         if (XorY === 0) {
@@ -66,13 +76,8 @@ class Field {
             }
         }
         
-        maskedField[startX][startY] = pathCharacter;
-        return maskedField;
-    }
-
-    // places hat, holes, and player on the field
-    static generateUnmaskedField(maskedField) {
-        return maskedField;
+        this._maskedField[startY][startX] = pathCharacter;
+        console.log(this.print(this._maskedField));
     }
 
     // moves player based on user input
@@ -104,7 +109,6 @@ function playGame() {
     let winLossConditionMet = false;
 
     const newGame = new Field(height, width);
-    newGame.print(newGame.maskedField);
 }
 
 playGame();
